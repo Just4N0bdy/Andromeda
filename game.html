@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Windows 11 Dark Theme Palette */
+      --bg-gradient: radial-gradient(circle at 50% -20%, #3b448f 0%, #1a1a1a 80%, #000000 100%);
+      --glass-bg: rgba(32, 32, 32, 0.7); 
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent-color: #0078d4; 
+      --text-main: #ffffff;
+      --text-muted: #a1a1a1;
+      --taskbar-bg: rgba(28, 28, 28, 0.85);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI Variable", "Segoe UI", "Poppins", sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+    }
+
+    /* --- Iframe (Game Screen) --- */
+    iframe {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: none; 
+      z-index: 1;
+      background: black;
+    }
+
+    /* --- Overlay (Start Screen) --- */
+    .viewer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(25px) saturate(1.5);
+      transition: opacity 0.5s ease;
+    }
+
+    .game-info-large {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .game-title-large {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: -1.5px;
+    }
+
+    .game-author {
+      color: var(--text-muted);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Win11 Blue Play Button */
+    #playBtn {
+      padding: 15px 45px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--accent-color);
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+    }
+
+    #playBtn svg { width: 20px; height: 20px; fill: white; }
+    #playBtn:hover { transform: scale(1.02); filter: brightness(1.1); }
+    #playBtn:active { transform: scale(0.98); }
+
+    /* --- Bottom HUD (Controls) --- */
+    .game-bar {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 60px;
+      background: var(--taskbar-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      gap: 20px;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transition: opacity 0.3s ease;
+    }
+
+    .game-left, .game-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .game-title-small {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #fff;
+      margin-right: 10px;
+    }
+
+    /* Taskbar Icon Style Buttons */
+    .control-btn {
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+
+    .control-btn svg { width: 20px; height: 20px; fill: currentColor; }
+    .control-btn:hover { background: rgba(255, 255, 255, 0.1); }
+
+    /* Settings Menu */
+    .settings-menu {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 15px;
+      width: 280px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .settings-menu.show {
+      display: flex;
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .settings-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .settings-input {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .settings-input:focus {
+      background: rgba(50, 50, 50, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .cursor-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .cursor-option {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .cursor-option:hover {
+      background: rgba(60, 60, 60, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .cursor-option.active {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .settings-button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent-color);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .settings-button:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    }
+
+    /* --- Sidebar Taskbar (Hidden when playing) --- */
+    .sidebar {
+      width: fit-content;
+      height: 60px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      display: flex;
+      padding: 0 15px;
+      gap: 8px;
+      z-index: 100;
+      transition: transform 0.5s ease;
+    }
+
+    .nav-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-btn svg { width: 22px; height: 22px; fill: #fff; }
+
+    @media (max-width: 768px) {
+      .game-bar { min-width: 90%; padding: 0 10px; }
+      .game-title-large { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="viewer-overlay" id="overlay">
+    <div class="game-info-large">
+      <div class="game-title-large" id="bigGameTitle">Loading...</div>
+      <div class="game-author">Hosted in Andromeda by Cementful</div>
+    </div>
+    <button id="playBtn" onclick="playGame()">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      Run Program
+    </button>
+
+    <nav class="sidebar" style="bottom: 40px; position: absolute;">
+      <a href="home.html"><button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button></a>
+      <a href="index.html"><button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></button></a>
+      <a href="apps.html"><button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg></button></a>
+      <button class="nav-btn" id="settingsBtn"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.62l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.48.1.62l2.03 1.58c-.05.3-.07.62-.07.94 0 .33.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.62l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.48-.1-.62l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
+    </nav>
+</div>
+
+<iframe id="gameFrame"></iframe>
+
+<!-- Settings Menu -->
+<div class="settings-menu" id="settingsMenu">
+  <div class="settings-group">
+    <label class="settings-label">Site Name</label>
+    <input type="text" class="settings-input" id="siteName" placeholder="Enter site name">
+  </div>
+
+  <div class="settings-group">
+    <label class="settings-label">Cursor Style</label>
+    <div class="cursor-selector">
+      <button class="cursor-option active" data-cursor="auto">Default</button>
+      <button class="cursor-option" data-cursor="crosshair">Crosshair</button>
+      <button class="cursor-option" data-cursor="grab">Grab</button>
+      <button class="cursor-option" data-cursor="cell">Cell</button>
+      <button class="cursor-option" data-cursor="zoom-in">Zoom In</button>
+      <button class="cursor-option" data-cursor="zoom-out">Zoom Out</button>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <label class="settings-label">Favicon</label>
+    <input type="file" class="settings-input" id="faviconInput" accept="image/*">
+  </div>
+
+  <button class="settings-button" id="resetBtn">Reset to Default</button>
+</div>
+
+<div class="game-bar" id="gameHUD" style="display: none;">
+  <div class="game-left">
+    <button class="control-btn" onclick="window.location.href='index.html'" title="Exit">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.15);"></div>
+    <span class="game-title-small" id="gameTitle">Game Name</span>
+  </div>
+
+  <div class="game-right">
+    <button class="control-btn" onclick="reloadGame()" title="Reload">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+    <button class="control-btn" onclick="fullscreen()" title="Toggle Fullscreen">
+      <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // Settings functionality
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsMenu = document.getElementById('settingsMenu');
+  const siteName = document.getElementById('siteName');
+  const faviconInput = document.getElementById('faviconInput');
+  const resetBtn = document.getElementById('resetBtn');
+  const cursorOptions = document.querySelectorAll('.cursor-option');
+
+  // Toggle settings menu
+  settingsBtn.addEventListener('click', () => {
+    settingsMenu.classList.toggle('show');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#settingsBtn') && !e.target.closest('#settingsMenu')) {
+      settingsMenu.classList.remove('show');
+    }
+  });
+
+  // Load settings from localStorage
+  function loadSettings() {
+    const savedName = localStorage.getItem('siteName') || 'Andromeda';
+    const savedCursor = localStorage.getItem('cursorStyle') || 'auto';
+    const savedFavicon = localStorage.getItem('faviconData');
+
+    siteName.value = savedName;
+    document.title = savedName + '';
+    document.body.style.cursor = savedCursor;
+
+    // Update cursor button states
+    cursorOptions.forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.getAttribute('data-cursor') === savedCursor) {
+        btn.classList.add('active');
+      }
+    });
+
+    // Load favicon
+    if (savedFavicon) {
+      setFavicon(savedFavicon);
+    }
+  }
+
+  // Site name change
+  siteName.addEventListener('change', (e) => {
+    const newName = e.target.value || 'Andromeda';
+    localStorage.setItem('siteName', newName);
+    document.title = newName + '';
+  });
+
+  // Cursor style change
+  cursorOptions.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cursor = btn.getAttribute('data-cursor');
+      localStorage.setItem('cursorStyle', cursor);
+      document.body.style.cursor = cursor;
+
+      cursorOptions.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Favicon upload
+  faviconInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target.result;
+        localStorage.setItem('faviconData', dataUrl);
+        setFavicon(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Set favicon
+  function setFavicon(dataUrl) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = dataUrl;
+  }
+
+  // Reset to default
+  resetBtn.addEventListener('click', () => {
+    localStorage.clear();
+    siteName.value = 'Andromeda';
+    document.title = '';
+    document.body.style.cursor = 'auto';
+    
+    let link = document.querySelector("link[rel~='icon']");
+    if (link) link.href = '';
+
+    cursorOptions.forEach(btn => btn.classList.remove('active'));
+    cursorOptions[0].classList.add('active');
+
+    faviconInput.value = '';
+    settingsMenu.classList.remove('show');
+  });
+
+  // Initialize settings on page load
+  loadSettings();
+
+const FILE_URL = sessionStorage.getItem("gameUrl"); 
+const GAME_NAME = sessionStorage.getItem("gameName") || "Unknown Program"; 
+const frame = document.getElementById("gameFrame");
+const hud = document.getElementById("gameHUD");
+
+document.getElementById("gameTitle").textContent = GAME_NAME;
+document.getElementById("bigGameTitle").textContent = GAME_NAME;
+
+async function playGame() {
+  const overlay = document.getElementById("overlay");
+  overlay.style.opacity = '0';
+  
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    hud.style.display = 'flex'; // Show the bar when starting
+  }, 500);
+
+  frame.style.display = "block";
+
+  try {
+    const response = await fetch(FILE_URL);
+    const html = await response.text();
+    const baseUrl = FILE_URL.substring(0, FILE_URL.lastIndexOf('/') + 1);
+    
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    if (!doc.querySelector('base')) {
+      const base = doc.createElement('base');
+      base.href = baseUrl;
+      doc.head ? doc.head.insertBefore(base, doc.head.firstChild) : doc.documentElement.insertBefore(base, doc.documentElement.firstChild);
+    }
+    frame.srcdoc = doc.documentElement.outerHTML;
+  } catch (e) {
+    frame.src = FILE_URL; 
+  }
+}
+
+// --- Fullscreen Logic with Auto-Hide ---
+function fullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// Listen for the fullscreen change event (works for button clicks and ESC key)
+document.addEventListener('fullscreenchange', () => {
+  if (document.fullscreenElement) {
+    // We are in fullscreen: Hide the bar
+    hud.style.display = 'none';
+  } else {
+    // We exited fullscreen: Show the bar again
+    // Only show it if the game has actually started (overlay is gone)
+    if (document.getElementById("overlay").style.display === 'none') {
+      hud.style.display = 'flex';
+    }
+  }
+});
+
+function reloadGame() {
+  // Efficient way to reload srcdoc
+  const currentContent = frame.srcdoc;
+  frame.srcdoc = '';
+  frame.srcdoc = currentContent;
+}
+</script>
+
+</body>
+</html>
