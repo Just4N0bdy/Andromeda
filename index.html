@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Windows 11 Dark Theme Palette */
+      --bg-gradient: radial-gradient(circle at 50% -20%, #6370e6 0%, #4c4b4b 80%, #ffffff 100%);
+      --glass-bg: rgba(32, 32, 32, 0.7); /* Windows 11 "Mica" dark effect */
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent-color: #0078d4; /* Windows Blue */
+      --text-main: #ffffff;
+      --text-muted: #a1a1a1;
+      --card-hover: rgba(255, 255, 255, 0.05);
+      --taskbar-bg: rgba(28, 28, 28, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      /* System font stack to match Windows 11 feel */
+      font-family: "Segoe UI Variable", "Segoe UI", "Poppins", sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- Windows 11 Taskbar-style Sidebar --- */
+    .sidebar {
+      width: fit-content;
+      height: 60px;
+      position: fixed;
+      bottom: 20px; /* Floating at bottom like Win11 */
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0 15px;
+      gap: 8px;
+      z-index: 1000;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s ease;
+      position: relative;
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--text-main);
+      transition: transform 0.2s cubic-bezier(0.1, 0.7, 0.1, 1);
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-btn:active svg {
+      transform: scale(0.85);
+    }
+
+    /* Tooltip */
+    .nav-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 70px;
+      background: #333;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      border: 1px solid var(--glass-border);
+    }
+
+    .nav-btn:hover::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* --- Main Content --- */
+    .main-content {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 40px 120px 40px;
+    }
+
+    .header {
+      text-align: left; /* Windows 11 Settings/Store style is left-aligned */
+      margin-bottom: 40px;
+    }
+
+    .main-title {
+      font-size: 3rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 5px;
+      letter-spacing: -0.5px;
+    }
+
+    .counter {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Windows 11 Search Input */
+    .search-container {
+      margin-top: 25px;
+    }
+
+    .search-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 15px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 2px solid var(--text-muted); /* Classic Win11 focus line base */
+      background: rgba(40, 40, 40, 0.6);
+      color: white;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      background: rgba(50, 50, 50, 0.8);
+      border-bottom: 2px solid var(--accent-color);
+    }
+
+    /* --- Keeping Grid/Cards the same as requested --- */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 30px;
+    }
+
+    .game-card {
+      position: relative;
+      aspect-ratio: 5/3;
+      background: var(--glass-bg);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27), box-shadow 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-color: var(--accent-color);
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+      opacity: 0.8;
+    }
+
+    .game-card:hover img {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+
+    .card-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover .card-info {
+      transform: translateY(0);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    /* Settings Menu */
+    .settings-menu {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 15px;
+      width: 280px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .settings-menu.show {
+      display: flex;
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .settings-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .settings-input {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .settings-input:focus {
+      background: rgba(50, 50, 50, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .cursor-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .cursor-option {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .cursor-option:hover {
+      background: rgba(60, 60, 60, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .cursor-option.active {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .settings-button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent-color);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .settings-button:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .main-title { font-size: 2rem; }
+      .sidebar { bottom: 10px; width: 90%; }
+      .settings-menu { width: 250px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="sidebar">
+    <a href="home.html"><button class="nav-btn" data-tooltip="Home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button></a>
+    <a href="index.html"><button class="nav-btn" data-tooltip="Games"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></button></a>
+    <a href="apps.html"><button class="nav-btn" data-tooltip="Apps"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg></button></a>
+    <button class="nav-btn" id="settingsBtn" data-tooltip="Settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.62l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.48.1.62l2.03 1.58c-.05.3-.07.62-.07.94 0 .33.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.62l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.48-.1-.62l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
+  </nav>
+
+  <!-- Settings Menu -->
+  <div class="settings-menu" id="settingsMenu">
+    <div class="settings-group">
+      <label class="settings-label">Site Name</label>
+      <input type="text" class="settings-input" id="siteName" placeholder="Enter site name">
+    </div>
+
+    <div class="settings-group">
+      <label class="settings-label">Cursor Style</label>
+      <div class="cursor-selector">
+        <button class="cursor-option active" data-cursor="auto">Default</button>
+        <button class="cursor-option" data-cursor="crosshair">Crosshair</button>
+        <button class="cursor-option" data-cursor="grab">Grab</button>
+        <button class="cursor-option" data-cursor="cell">Cell</button>
+        <button class="cursor-option" data-cursor="zoom-in">Zoom In</button>
+        <button class="cursor-option" data-cursor="zoom-out">Zoom Out</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <label class="settings-label">Favicon</label>
+      <input type="file" class="settings-input" id="faviconInput" accept="image/*">
+    </div>
+
+    <button class="settings-button" id="resetBtn">Reset to Default</button>
+  </div>
+
+  <main class="main-content">
+    <div class="header">
+      <h1 class="main-title">Games</h1>
+      <p class="counter">Library Collection: <span id="count" style="font-weight:bold;">0</span> items</p>
+      
+      <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search your library..." oninput="filterGames(this.value)">
+      </div>
+    </div>
+
+    <div class="games-grid" id="grid"></div>
+  </main>
+
+  <script>
+    // Settings functionality
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsMenu = document.getElementById('settingsMenu');
+    const siteName = document.getElementById('siteName');
+    const faviconInput = document.getElementById('faviconInput');
+    const resetBtn = document.getElementById('resetBtn');
+    const cursorOptions = document.querySelectorAll('.cursor-option');
+
+    // Toggle settings menu
+    settingsBtn.addEventListener('click', () => {
+      settingsMenu.classList.toggle('show');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#settingsBtn') && !e.target.closest('#settingsMenu')) {
+        settingsMenu.classList.remove('show');
+      }
+    });
+
+    // Load settings from localStorage
+    function loadSettings() {
+      const savedName = localStorage.getItem('siteName') || 'Games';
+      const savedCursor = localStorage.getItem('cursorStyle') || 'auto';
+      const savedFavicon = localStorage.getItem('faviconData');
+
+      siteName.value = savedName;
+      document.title = savedName + '';
+      document.body.style.cursor = savedCursor;
+
+      // Update cursor button states
+      cursorOptions.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-cursor') === savedCursor) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Load favicon
+      if (savedFavicon) {
+        setFavicon(savedFavicon);
+      }
+    }
+
+    // Site name change
+    siteName.addEventListener('change', (e) => {
+      const newName = e.target.value || 'Games';
+      localStorage.setItem('siteName', newName);
+      document.title = newName + ' ';
+    });
+
+    // Cursor style change
+    cursorOptions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cursor = btn.getAttribute('data-cursor');
+        localStorage.setItem('cursorStyle', cursor);
+        document.body.style.cursor = cursor;
+
+        cursorOptions.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Favicon upload
+    faviconInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          localStorage.setItem('faviconData', dataUrl);
+          setFavicon(dataUrl);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Set favicon
+    function setFavicon(dataUrl) {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = dataUrl;
+    }
+
+    // Reset to default
+    resetBtn.addEventListener('click', () => {
+      localStorage.clear();
+      siteName.value = 'Games';
+      document.title = 'Games';
+      document.body.style.cursor = 'auto';
+      
+      let link = document.querySelector("link[rel~='icon']");
+      if (link) link.href = '';
+
+      cursorOptions.forEach(btn => btn.classList.remove('active'));
+      cursorOptions[0].classList.add('active');
+
+      faviconInput.value = '';
+      settingsMenu.classList.remove('show');
+    });
+
+    // Initialize settings on page load
+    loadSettings();
+
+    const games = [
+    {
+      name: "1v1.lol",
+      image: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/1v1lol/favicon.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/1v1lol.html"
+    },
+    {
+      name: "3Dash",
+      image: "images/2048.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/3dash.html"
+    },
+    {
+      name: "500 Caliber Contractz",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/500calibercontractz.html"
+    },
+    {
+      name: "A Dance of Fire and Ice",
+      image: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/adofai/icon.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/adofai2.html"
+    },
+    {
+      name: "A Date With Death",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/adatewithdeath.html"
+    },
+    {
+      name: "A Day In The Office",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/adayintheoffice.html"
+    },
+    {
+      name: "Ahoy Survival",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/adayintheoffice.html"
+    },
+    {
+      name: "Ages of Conflict",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/agesofconflict.html"
+    },
+    {
+      name: "Among Us",
+      image: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/amongus/amgojs%5D_.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/amongus.html"
+    },
+    {
+      name: "Angry Birds",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/angrybirds.html"
+    },
+    {
+      name: "Backrooms",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/backrooms.html"
+    },
+    {
+      name: "Bacons May Die",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/baconsmaydie.html"
+    },
+    {
+      name: "Bad Monday Simulator",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/badmondaysimulator.html"
+    },
+    {
+      name: "Bad Parenting",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/badparenting.html"
+    },
+    {
+      name: "Baldi's Basic Remastered",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/baldis-basics/splash.png"
+    },
+    {
+      name: "Basket Random",
+      image: "images",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/basketrandom/index.html"
+    },
+    {
+      name: "Basketball Stars",
+      image: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/basketball-stars/icon.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/basketballstars.html"
+    },
+    {
+      name: "Batter Up",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/batterup.html"
+    },
+    {
+      name: "Battles",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/battles.html"
+    },
+    {
+      name: "Battle Simulator",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/battlesimulator.html"
+    },
+        {
+      name: "BERGENTRUCK 201X",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bergentruck201x.html"
+    },
+    {
+      name: "BFDIA 5B",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bfdia5b.html"
+    },
+    {
+      name: "Big Ice Tower Tiny Square",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bigtowersnow.html"
+    },
+    {
+      name: "Big Neon Tower Tiny Square",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bigneontower.html"
+    },
+    {
+      name: "Big Tower Tiny Square 2",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bigtower2.html"
+    },
+    {
+      name: "Bio Evil 4",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bioevil4.html"
+    },
+    {
+      name: "Bitlife",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bitlife.html"
+    },
+    {
+      name: "Block Blast",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/blockblast.html"
+    },
+    {
+      name: "Blockpost",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/blockpost.html"
+    },
+    {
+      name: "BLOODMONEY!",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bloodmoney.html"
+    },
+    {
+      name: "Bob the Robber 2",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bobtherobber2.html"
+    },
+    {
+      name: "Bob the Robber 5",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bobtherobber5.html"
+    },
+    {
+      name: "Bowmaster",
+      image: "images/tetris.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bowmaster.html"
+    },
+    {
+      name: "Boxing Random",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/boxingrandom.html"
+    },
+    {
+      name: "Brige Race",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bridgeraise.html"
+    },
+    {
+      name: "Bloons TD 6",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/btd6.html"
+    },
+    {
+      name: "Burger and Frights",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/burgerandfrights.html"
+    },
+    {
+      name: "Canon Balls 3D",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/canonballs3d.html"
+    },
+    {
+      name: "Capybara Clicker",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/capybaraclicker.html"
+    },
+    {
+      name: "Car Crash 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/carcrash3.html"
+    },
+    {
+      name: "Car Kings Arena",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/carkingsarena.html"
+    },
+    {
+      name: "Cartoon Network Table Tennis",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/cartoonnetworktennis.html"
+    },
+    {
+      name: "Cat Mario",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/catmario.html"
+    },
+    {
+      name: "Celeste PICO",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/celestepico.html"
+    },
+    {
+      name: "Celeste PICO 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/celeste2.html"
+    },
+    {
+      name: "Cell Machine",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/cellmachine.html"
+    },
+    {
+      name: "Chaos Faction 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/chaosfaction2.html"
+    },
+    {
+      name: "Cheese Chompers 3D",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/cheesechompers.html"
+    },
+    {
+      name: "Chess Classic",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/chessclassic.html"
+    },
+    {
+      name: "Chicken Scream",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/chickenscream.html"
+    },
+    {
+      name: "Chickenwar",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/chickenwar.html"
+    },
+    {
+      name: "Choppy Orc",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/choppyorc.html"
+    },
+    {
+      name: "CircloO 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/circloo2.html"
+    },
+    {
+      name: "Clash of Vikings",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/clashofvikings.html"
+    },
+    {
+      name: "Class of '09",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/classof09.html"
+    },
+    {
+      name: "Cluster Rush",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/clusterrush.html"
+    },
+    {
+      name: "Coal LLC.",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/coalllc.html"
+    },
+    {
+      name: "Cookie Clicker",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/cookieclicker.html"
+    },
+    {
+      name: "Crazy Cattle 3D",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/crazycattle.html"
+    },
+    {
+      name: "Crazy Chicken 3D",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/crazychicken.html"
+    },
+    {
+      name: "CSGO Clicker",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/csgoclicker.html"
+    },
+    {
+      name: "Dandy's World Clicker",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/dandyworldclicker.html"
+    },
+    {
+      name: "Deltarune Chapter 1 and 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/regedit-sys/web-port@main/deltarune/free.html"
+    },
+    {
+      name: "Deltatraveler",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/deltatraveler.html"
+    },
+    {
+      name: "Dogeminer",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/dogeminer.html"
+    },
+    {
+      name: "Dogeminer 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/dogeminer2.html"
+    },
+    {
+      name: "Doki Doki Literature Club",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/dokidokilit.html"
+    },
+    {
+      name: "Doodle Jump",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/doodlejump.html"
+    },
+    {
+      name: "Drift Boss",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/driftboss.html"
+    },
+    {
+      name: "Drive Mad",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/drivemad.html"
+    },
+    {
+      name: "Duck Life Space",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/ducklifespace.html"
+    },
+    {
+      name: "Duck Life Battle",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/ducklifebattle.html"
+    },
+    {
+      name: "Ducklings.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/duckling.html"
+    },
+    {
+      name: "Dungeons and Degenerate Gamblers",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/dungeonsgamble.html"
+    },
+    {
+      name: "Edelweiss",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/edelweiss.html"
+    },
+    {
+      name: "Eagle Ride",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/eagleride.html"
+    },
+    {
+      name: "Escape Road",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/escaperoad.html"
+    },
+    {
+      name: "Extreme Run 3D",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/extremerun3d.html"
+    },
+    {
+      name: "Evolution",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/evolution.html"
+    },
+    {
+      name: "Fears to Fanthom: Home Alone",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/ftfhomealone.html"
+    },
+    {
+      name: "Fireboy and Watergirl 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fireboyandwatergirl2.html"
+    },
+    {
+      name: "Fireboy and Watergirl 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fireboyandwatergirl3.html"
+    },
+    {
+      name: "Five Nights at Candy's",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnac.html"
+    },
+    {
+      name: "Five Nights at Candy's 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnac2.html"
+    },
+    {
+      name: "Five Nights at Baldi's Redone",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fivenightsatbaldisredone.html"
+    },
+    {
+      name: "Flappy Dunk",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/flappydunk.html"
+    },
+    {
+      name: "Flood Runner 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/floodrunner2.html"
+    },
+    {
+      name: "Flood Runner 4",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/floodrunner4.html"
+    },
+    {
+      name: "Five Nights at Freddy's",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnaf.html"
+    },
+    {
+      name: "Five Nights at Freddy's 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnaf2.html"
+    },
+    {
+      name: "Five Nights at Freddy's 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnaf3.html"
+    },
+    {
+      name: "Five Nights at Freddy's 4",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnaf4.html"
+    },
+    {
+      name: "Five Nights at Freddy's 4 Halloween",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnaf4halloween.html"
+    },
+    {
+      name: "Five Nights at Freddy's Pizzeria Simulator",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnaffps.html"
+    },
+    {
+      name: "Five Nights at Freddy's Ultimate Custom Night",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnafucn.html"
+    },
+    {
+      name: "Five Nights at Freddy's Sister's Location",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnafsl.html"
+    },
+    {
+      name: "Five Nights at Freddy's World",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnafworld.html"
+    },
+    {
+      name: "Fork and Sausage",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/forkandsausage.html"
+    },
+    {
+      name: "Fruit Ninja",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fruitninja.html"
+    },
+    {
+      name: "Funny Shooter 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/funnyshooter2.html"
+    },
+    {
+      name: "Getaway Shootout",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/getawayshootout.html"
+    },
+    {
+      name: "Going Balls",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/goingballs.html"
+    },
+    {
+      name: "Granny",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/granny.html"
+    },
+    {
+      name: "Granny 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/granny2.html"
+    },
+    {
+      name: "Granny 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/granny3.html"
+    },
+    {
+      name: "Grindcraft",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/grindcraft.html"
+    },
+    {
+      name: "Grow A Garden",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/growagarden.html"
+    },
+    {
+      name: "Half Life",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/halflife.html"
+    },
+    {
+      name: "Harvest.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/harvestio.html"
+    },
+    {
+      name: "Hole.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/holeio.html"
+    },
+    {
+      name: "Hollow Knight",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/hollowknight.html"
+    },
+    {
+      name: "Hotline Miami",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/hotlinemiami.html"
+    },
+    {
+      name: "Hungry Lamu",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/hungrylamu.html"
+    },
+    {
+      name: "Hyper Sandbox",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/hypersandbox.html"
+    },
+    {
+      name: "Idle Idle Game Dev",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/idleidlegamedev.html"
+    },
+    {
+      name: "Idle Miner Tycoon",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/idleminertycoon.html"
+    },
+    {
+      name: "Indian Truck Simulator",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/trucksim.html"
+    },
+    {
+      name: "i woke up next to you again",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/iwokeupnexttou.html"
+    },
+    {
+      name: "Infinite Craft",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/infinitecraft.html"
+    },
+    {
+      name: "Into Ruins",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/intoruins.html"
+    },
+    {
+      name: "Into the Deep Web",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/intothedeepweb.html"
+    },
+    {
+      name: "Islander",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/islander.html"
+    },
+    {
+      name: "I Wanna Be the Guy",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/iwannabetheguy.html"
+    },
+    {
+      name: "Jail Break Obby",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jailbreakobby.html"
+    },
+    {
+      name: "Jefflings",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jefflings.html"
+    },
+    {
+      name: "Jelly Drift",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jellydrift.html"
+    },
+    {
+      name: "Jelly Truck",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jellytruck.html"
+    },
+    {
+      name: "Jetpack Joyride",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jetpackjoyride.html"
+    },
+    {
+      name: "Jetski Race",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jetskirace.html"
+    },
+    {
+      name: "Jet Rush",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jetrush.html"
+    },
+    {
+      name: "Johnny Trigger",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/johnnytrigger.html"
+    },
+    {
+      name: "Jumping Shell",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/jumpingshell.html"
+    },
+    {
+      name: "Justfall.lol",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/justfalllol.html"
+    },
+    {
+      name: "Just One Boss",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/justoneboss.html"
+    },
+    {
+      name: "Karlson",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/karlson.html"
+    },
+    {
+      name: "Kart Bros",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/kartbros.html"
+    },
+    {
+      name: "Killer Instinct",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkillerinstinct.html"
+    },
+    {
+      name: "KILLOVER",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkillover.html"
+    },
+    {
+      name: "Kill the Ice Age Baby Adventure",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkilltheiceagebabyadventure.html"
+    },
+    {
+      name: "Kingdom Hearts Days",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkingdomheartsdays.html"
+    },
+    {
+      name: "Kirby 64",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirby64.html"
+    },
+    {
+      name: "Kirby and The Amazing Mirror",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirbyandtheamzingmirror.html"
+    },
+    {
+      name: "Kirby's Adventure",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirbysadventure.html"
+    },
+    {
+      name: "Kirby's Dreamland",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirbysdreamland.html"
+    },
+    {
+      name: "Kirby's Dreamland 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirbysdreamland3.html"
+    },
+    {
+      name: "Kirby Superstar",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirbysuperstar.html"
+    },
+    {
+      name: "Kirby Superstar Ultra",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkirbysuperstarultra.html"
+    },
+    {
+      name: "Kitten Cannon",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkittencannon.html"
+    },
+    {
+      name: "Klifur",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clklifur.html"
+    },
+    {
+      name: "Knife Hit",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clknifehit.html"
+    },
+    {
+      name: "Knightmare Tower",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clknightmaretower.html"
+    },
+    {
+      name: "Koopas Revenge",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkoopasrevenge.html"
+    },
+    {
+      name: "Kour.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clkourio.html"
+    },
+    {
+      name: "Lacey's Flash Games",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllaceysflashgames.html"
+    },
+    {
+      name: "Last Horizon",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllasthorizon.html"
+    },
+    {
+      name: "Last Stand",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllaststand.html"
+    },
+    {
+      name: "Last Stand 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllaststand2.html"
+    },
+    {
+      name: "Leader Strike",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clleaderstrike.html"
+    },
+    {
+      name: "Learn To Fly",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllearntofly.html"
+    },
+    {
+      name: "Learn To Fly 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllearntofly2.html"
+    },
+    {
+      name: "Learn To Fly 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllearntofly3.html"
+    },
+    {
+      name: "Learn To Fly Idle",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllearntoflyidle.html"
+    },
+    {
+      name: "Lego Batman",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllegobatman.html"
+    },
+    {
+      name: "Lego Indiana Jones",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllegoindianajones.html"
+    },
+    {
+      name: "Lego Indiana Jones 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllegoindianajones2.html"
+    },
+    {
+      name: "Lego Ninjago",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllegoninjago.html"
+    },
+    {
+      name: "Lego Star Wars",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllegostarwars.html"
+    },
+    {
+      name: "Lemmings",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllemmings.html"
+    },
+    {
+      name: "Level Devil",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clleveldevil.html"
+    },
+    {
+      name: "Lever Warrior",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clleverwarriors.html"
+    },
+    {
+      name: "Light It Up",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllightitup.html"
+    },
+    {
+      name: "Los Angeles Shark",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllosangelesshark.html"
+    },
+    {
+      name: "The Legend of Zelda: Link to the Past",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllinktothepast.html"
+    },
+    {
+      name: "The Legend of Zelda: Link's Awakening",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/cllozlinkawakening.html"
+    },
+    {
+      name: "Lucky Blocks",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clluckyblocks.html"
+    },
+    {
+      name: "Madden 93",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmadden93.html"
+    },
+    {
+      name: "Madden 94",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmadden94.html"
+    },
+    {
+      name: "Madden 95",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmadden95.html"
+    },
+    {
+      name: "Madden 96",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmadden96.html"
+    },
+    {
+      name: "Madden 99",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmadden99.html"
+    },
+    {
+      name: "Madden Football",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmaddenfootball.html"
+    },
+    {
+      name: "Madden Football 64",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmaddenfootball64.html"
+    },
+    {
+      name: "Madden NFL",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmaddennfl.html"
+    },
+    {
+      name: "Super Mario Bros 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmario3.html"
+    },
+    {
+      name: "Mario and Luigi Super Saga",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/UGS-Files/clmarioandluigisuperstarsaga.html"
+    },
+    {
+      name: "Mario Combat",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmariocombat.html"
+    },
+    {
+      name: "Mario Golf",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmariogolf.html"
+    },
+    {
+      name: "Mario Kart 64",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmariokart64.html"
+    },
+    {
+      name: "Mario Kart DS",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmariokartds.html"
+    },
+    {
+      name: "Mario Kart Super Circuit",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmariokartsupercircuit.html"
+    },
+    {
+      name: "Mario Madness",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmariomadness.html"
+    },
+    {
+      name: "Meat Boy",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/ugs-singlefile@main/UGS-Files/clmeatboy.html"
+    },
+    {
+      name: "Melon Playground",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/melonplayground.html"
+    },
+    {
+      name: "Super Mario Bros",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/supermariobros.html"
+    },
+    {
+      name: "Super Mario Bros 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/supermariobros2.html"
+    },
+    {
+      name: "That's Not My Neighbor",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/thatsnotmyneighbor.html"
+    },
+    {
+      name: "ULTRAKILL",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/ultrakill.html"
+    },
+    {
+      name: "Undertale Yellow",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/regedit-sys/web-port@main/undertale-yellow/index.html"
+    },
+    {
+      name: "Yume Nikki",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/regedit-sys/web-port@main/yume-nikki/index.html"
+    },
+    {
+      name: "Bendy and the Ink Machine",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/regedit-sys/web-port@main/bendy/index.html"
+    },
+    {
+      name: "Sonic Hellfire Saga",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clSonicHellfireSaga.html"
+    },
+    {
+      name: "Stickman Kingdom Clash",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clStickmanKingdomclash.html"
+    },
+    {
+      name: "Sandboxels",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsandboxels.html"
+    },
+    {
+      name: "Sandtris",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsandtris.html"
+    },
+    {
+      name: "SAS: Zombie Assault 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsaszombieassault2.html"
+    },
+    {
+      name: "Silent Hill",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsilenthill.html"
+    },
+    {
+      name: "Skibiditoilet.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clskibididibidygyattohiorizzingallovertheplacestillwatermangotheoryfemboydrool.html"
+    },
+    {
+      name: "Slither.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clslitherio.html"
+    },
+    {
+      name: "Slope",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clslope.html"
+    },
+    {
+      name: "Slope 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clslope2player.html"
+    },
+    {
+      name: "Slope 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clslope3.html"
+    },
+    {
+      name: "Smash Karts",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsmashkarts.html"
+    },
+    {
+      name: "Sonic Advance",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicadvance.html"
+    },
+    {
+      name: "Sonic Advance 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicadvance2.html"
+    },
+    {
+      name: "Sonic Advance 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicadvance3.html"
+    },
+    {
+      name: "Sonic Classic Collection",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicclassiccollection.html"
+    },
+    {
+      name: "Sonic the Hedgehog",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicthehedgehog.html"
+    },
+    {
+      name: "Sonic the Hedgehog 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicthehedgehog2.html"
+    },
+    {
+      name: "Sonic the Hedgehog 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsonicthehedgehog3.html"
+    },
+    {
+      name: "Spacebar Clicker",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clspacebarclicker.html"
+    },
+    {
+      name: "Space Waves",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clspacewaves.html"
+    },
+    {
+      name: "Spiral Roll",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clspiralroll.html"
+    },
+    {
+      name: "Sprunki",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsprunki.html"
+    },
+    {
+      name: "Sprunki Clicker",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsprunkiclicker.html"
+    },
+    {
+      name: "Stacktris",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstacktris.html"
+    },
+    {
+      name: "State.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstateio.html"
+    },
+    {
+      name: "Stealth Master",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstealthmaster.html"
+    },
+    {
+      name: "Stickman Duel",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickmanduel.html"
+    },
+    {
+      name: "Stickman GTA City",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickmangtacity.html"
+    },
+    {
+      name: "Stickman Hook",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickmanhook.html"
+    },
+    {
+      name: "Stick RPG",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickrpgcomplete.html"
+    },
+    {
+      name: "Henry Stickmin: Breaking the Bank",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickminbreakingbank.html"
+    },
+    {
+      name: "Henry Stickmin: Escaping Prison",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickminescapingprison.html"
+    },
+    {
+      name: "Henry Stickmin: Fleeing the Complex",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clstickminfleecomplex.html"
+    },
+    {
+      name: "Subway Surfers Barcelona",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersbarcelona.html"
+    },
+    {
+      name: "Subway Surfers Beijing",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersbeijing.html"
+    },
+    {
+      name: "Subway Surfers Berlin",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersberlin.html"
+    },
+    {
+      name: "Subway Surfers Buenos Aires",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersbuenosaires.html"
+    },
+    {
+      name: "Subway Surfers Havana",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfershavana.html"
+    },
+    {
+      name: "Subway Surfers Iceland",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersiceland.html"
+    },
+    {
+      name: "Subway Surfers London",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurferslondon.html"
+    },
+    {
+      name: "Subway Surfers Mexico",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersmexico.html"
+    },
+    {
+      name: "Subway Surfers Miami",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersmiami.html"
+    },
+    {
+      name: "Subway Surfers Monaco",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersmonaco.html"
+    },
+    {
+      name: "Subway Surfers New Orleans",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurfersneworleans.html"
+    },
+    {
+      name: "Subway Surfers San Francisco",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurferssanfrancisco.html"
+    },
+    {
+      name: "Subway Surfers Winter Holiday",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurferswinterholiday.html"
+    },
+    {
+      name: "Subway Surfers Zurich",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsubwaysurferszurich.html"
+    },
+    {
+      name: "Suika",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsuika.html"
+    },
+    {
+      name: "Pokemon: Sun and Moon",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clsunandmoon.html"
+    },
+    {
+      name: "Pokemon Sword and Shield Ultimate Plus",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/S/clswordandshieldultimateplus.html"
+    },
+    {
+      name: "Eaglecraft 1.5.2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/minecraft/eaglercraft.1.5.2.html"
+    },
+    {
+      name: "Eaglecraft 1.11.2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/minecraft/EaglercraftZ_1.11.2.html"
+    },
+    {
+      name: "Friday Night Funkin'",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/F/clfridaynightfunkin.html"
+    },
+    {
+      name: "Fairy Tale vs One Piece",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/F/clfairytalevsonepiece.html"
+    },
+    {
+      name: "World's Hardest Game 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/worldhardestgame2/index.html"
+    },
+    {
+      name: "The Impossible Quiz",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/theimpossiblequiz/index.html"
+    },
+    {
+      name: "1v1.lol Alt",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/brickyosu/ugs-files-sorted@main/1/cl1v1lolifnoaboutblank.html"
+    },
+    {
+      name: "Snow Rider 3D",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Random-Stuff@main/snowrider.html"
+    },
+    {
+      name: "Friday Night Crunchin'",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/Fridaynightcrunchin.html"
+    },
+    {
+      name: "Friday Night Bustin'",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfdustin.html"
+    },
+    {
+      name: "Friday Night Funkin' - Below the Depths",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfbelowthedepths.html"
+    },
+    {
+      name: "Friday Night Funkin': CANDY CARRIER CHAOS",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfcandycharacter.html"
+    },
+    {
+      name: "Friday Night Funkin' Chaos Nightmare",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnffleetway.html"
+    },
+    {
+      name: "Friday Night Funkin' Doki Doki Takeover",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfdokidokitakeover.html"
+    },
+    {
+      name: "Friday Night Funkin' Mario Madness",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/mariomadness.html"
+    },
+    {
+      name: "Friday Night Funkin' vs Camellia RUDE BUSTER",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfrudebuster.html"
+    },
+    {
+      name: "Friday Night Funkin' vs Herobrine: Blocky Myths",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfherobrine.html"
+    },
+    {
+      name: "Friday Night Funkin' VS Sonic.exe 3.0/4.0",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfsonicexe.html"
+    },
+    {
+      name: "Friday Night Funkin' Undertale",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfundertale.html"
+    },
+    {
+      name: "Friday Night Funkin' - V.S Chara",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/fnf/fnfchara.html"
+    },
+    {
+      name: "Vex 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex3.html"
+    },
+    {
+      name: "Vex 3 XMas",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex3xmas.html"
+    },
+    {
+      name: "Vex 4",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex4.html"
+    },
+    {
+      name: "Vex 5",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex5.html"
+    },
+    {
+      name: "Vex 6",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex6.html"
+    },
+    {
+      name: "Vex 7",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex7.html"
+    },
+    {
+      name: "Vex 8",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vex8.html"
+    },
+    {
+      name: "Vex Challenges",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vexchallanges.html"
+    },
+    {
+      name: "Vex x3m",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vexx3m.html"
+    },
+    {
+      name: "Vex x3m 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/vex/vexx3m2.html"
+    },
+    {
+      name: "Tag",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tag.html"
+    },
+    {
+      name: "Tag 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tag2.html"
+    },
+    {
+      name: "Temple Run 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/templerun2.html"
+    },
+    {
+      name: "TEMPOVERDOSE",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tempoverdose"
+    },
+    {
+      name: "Teritorrial.io",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/teritorrialio.html"
+    },
+    {
+      name: "Terra",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/terra.html"
+    },
+    {
+      name: "The Deadseat",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/thedeadseat.html"
+    },
+    {
+      name: "The Man From the Window",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/themanfromthewindow.html"
+    },
+    {
+      name: "Time Shooter 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/timeshooter2.html"
+    },
+    {
+      name: "Time Shooter 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/timeshooter3.html"
+    },
+    {
+      name: "Tiny Fishing",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tinyfishing.html"
+    },
+    {
+      name: "Tomb of the Mask",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tombofthemask.html"
+    },
+    {
+      name: "Tralalelo Tralala Escape Tung Tung Tung Sahur",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tralaleloescapetriplet.html"
+    },
+    {
+      name: "Tung Tung Tung Sahur Obby",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/T/tripletobby.html"
+    },
+    {
+      name: "Quake III Arena",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/quake3.html"
+    },
+    {
+      name: "Pizza Tower",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/P/pizzatower.html"
+    },
+    {
+      name: "Phasma",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/P/phasma.html"
+    },
+    {
+      name: "Poly Track Old",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/P/polyold.html"
+    },
+    {
+      name: "Poly Track",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/P/polytrack.html"
+    },
+    {
+      name: "Nazi Zombies Portable",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/P/nzp.html"
+    },
+    {
+      name: "Minesweeper Plus",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/minesweeperplus.html"
+    },
+    {
+      name: "Bad Time Simulator",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/badtimesimulator/index.html"
+    },
+    {
+      name: "osu!",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/osu/index.html"
+    },
+    {
+      name: "DADISH",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/dadish/index.html"
+    },
+    {
+      name: "DADISH 2",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/dadish2/index.html"
+    },
+    {
+      name: "DADISH 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/dadish3/index.html"
+    },
+    {
+      name: "Little Alchemy",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@tree/main/littlealchemy"
+    },
+    {
+      name: "OvO",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/ovo/index.html"
+    },
+    {
+      name: "Pizza Tower",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/pizzatower/index.html"
+    },
+    { name: "Run",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/run/index.html"
+    },
+    {
+      name: "Run 3",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/run3/index.html"
+    },
+    {
+      name: "Justfall.lol",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/justfalllol/index.html"
+    },
+    {
+      name: "Yohoho",
+      image: "images/divide.png",
+      url: "https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/yohoho/index.html"
+    },
+
+  ];
+
+    games.sort((a, b) => a.name.localeCompare(b.name));
+
+    const grid = document.getElementById("grid");
+    const count = document.getElementById("count");
+
+    function renderGames(list) {
+      grid.innerHTML = "";
+      list.forEach(game => {
+        const card = document.createElement("div");
+        card.className = "game-card";
+        card.onclick = () => openGame(game);
+        card.innerHTML = `
+          <img src="${game.image}" alt="${game.name}" loading="lazy">
+          <div class="card-info">
+            <div class="card-title">${game.name}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      count.textContent = list.length;
+    }
+
+    function openGame(game) {
+      sessionStorage.setItem("gameUrl", game.url);
+      sessionStorage.setItem("gameName", game.name);
+      location.href = "game.html";
+    }
+
+    function filterGames(q) {
+      q = q.toLowerCase();
+      renderGames(games.filter(g => g.name.toLowerCase().includes(q)));
+    }
+
+    renderGames(games);
+  </script>
+</body>
+</html>
