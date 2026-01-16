@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Windows 11 Dark Theme Palette */
+      --bg-gradient: radial-gradient(circle at 50% -20%, #3b448f 0%, #1a1a1a 80%, #000000 100%);
+      --glass-bg: rgba(32, 32, 32, 0.7); 
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent-color: #0078d4; 
+      --text-main: #ffffff;
+      --text-muted: #a1a1a1;
+      --taskbar-bg: rgba(28, 28, 28, 0.85);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI Variable", "Segoe UI", "Poppins", sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- Windows 11 Taskbar --- */
+    .sidebar {
+      width: fit-content;
+      height: 60px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0 15px;
+      gap: 8px;
+      z-index: 1000;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s ease;
+      position: relative;
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--text-main);
+      transition: transform 0.2s cubic-bezier(0.1, 0.7, 0.1, 1);
+    }
+
+    .nav-btn:hover { background: rgba(255, 255, 255, 0.1); }
+
+    /* Tooltip */
+    .nav-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 70px;
+      background: #333;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      border: 1px solid var(--glass-border);
+    }
+
+    .nav-btn:hover::after { opacity: 1; transform: translateY(0); }
+
+    /* --- Content Layout --- */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 40px 120px 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .main-logo {
+      font-size: 5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+    }
+
+    .quote-container {
+      height: 30px;
+      color: var(--accent-color);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    /* --- Windows 11 Style Search Box --- */
+    .proxy-box {
+      width: 100%;
+      max-width: 600px;
+      align-self: center;
+      background: rgba(40, 40, 40, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 2px solid var(--text-muted);
+      padding: 8px;
+      border-radius: 6px;
+      display: flex;
+      backdrop-filter: blur(15px);
+      margin-bottom: 80px;
+      transition: all 0.2s ease;
+    }
+
+    .proxy-box:focus-within {
+      background: rgba(50, 50, 50, 0.8);
+      border-bottom: 2px solid var(--accent-color);
+    }
+
+    .proxy-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 12px 20px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .proxy-btn {
+      background: var(--accent-color);
+      border: none;
+      padding: 0 25px;
+      border-radius: 4px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .proxy-btn:hover { filter: brightness(1.2); }
+
+    /* Settings Menu */
+    .settings-menu {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 15px;
+      width: 280px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .settings-menu.show {
+      display: flex;
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .settings-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .settings-input {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .settings-input:focus {
+      background: rgba(50, 50, 50, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .cursor-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .cursor-option {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .cursor-option:hover {
+      background: rgba(60, 60, 60, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .cursor-option.active {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .settings-button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent-color);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .settings-button:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    }
+    .section-title {
+      align-self: flex-start;
+      margin-bottom: 25px;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .trending-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      width: 100%;
+    }
+
+    .trending-card {
+      background: var(--glass-bg);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27), box-shadow 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .trending-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-color: var(--accent-color);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      opacity: 0.8;
+      transition: 0.3s ease;
+    }
+
+    .trending-card:hover .card-img { opacity: 1; transform: scale(1.05); }
+
+    .card-content { padding: 20px; }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent-color);
+      color: white;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    @media (max-width: 768px) {
+      .main-logo { font-size: 3.5rem; }
+      .sidebar { bottom: 10px; width: 90%; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar">
+    <a href="home.html"><button class="nav-btn" data-tooltip="Home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button></a>
+    <a href="index.html"><button class="nav-btn" data-tooltip="Games"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></button></a>
+    <a href="apps.html"><button class="nav-btn" data-tooltip="Apps"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg></button></a>
+    <button class="nav-btn" id="settingsBtn" data-tooltip="Settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.62l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.48.1.62l2.03 1.58c-.05.3-.07.62-.07.94 0 .33.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.62l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.48-.1-.62l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
+  </nav>
+
+  <!-- Settings Menu -->
+  <div class="settings-menu" id="settingsMenu">
+    <div class="settings-group">
+      <label class="settings-label">Site Name</label>
+      <input type="text" class="settings-input" id="siteName" placeholder="Enter site name">
+    </div>
+
+    <div class="settings-group">
+      <label class="settings-label">Cursor Style</label>
+      <div class="cursor-selector">
+        <button class="cursor-option active" data-cursor="auto">Default</button>
+        <button class="cursor-option" data-cursor="crosshair">Crosshair</button>
+        <button class="cursor-option" data-cursor="grab">Grab</button>
+        <button class="cursor-option" data-cursor="cell">Cell</button>
+        <button class="cursor-option" data-cursor="zoom-in">Zoom In</button>
+        <button class="cursor-option" data-cursor="zoom-out">Zoom Out</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <label class="settings-label">Favicon</label>
+      <input type="file" class="settings-input" id="faviconInput" accept="image/*">
+    </div>
+
+    <button class="settings-button" id="resetBtn">Reset to Default</button>
+  </div>
+
+  <div class="container">
+    <header class="hero">
+      <h1 class="main-logo">Andromeda</h1>
+      <div class="quote-container" id="quote-box">"Loading..."</div>
+    </header>
+
+    <div class="proxy-box">
+      <input type="text" id="proxy-input" class="proxy-input" placeholder="Search or enter URL...">
+      <button class="proxy-btn" onclick="launchProxy()">GO</button>
+    </div>
+
+    <h2 class="section-title">Trending Games</h2>
+    <div class="trending-grid">
+      <div class="trending-card" onclick="openGame('Bitlife', 'https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/bitlife.html')">
+        <span class="badge">Popular</span>
+        <img src="https://via.placeholder.com/400x225/302b63/ffffff?text=Fluidism" class="card-img">
+        <div class="card-content">
+          <h3>Bitlife</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Life Simulator</p>
+        </div>
+      </div>
+
+      <div class="trending-card" onclick="openGame('A Dance of Fire and Ice', 'https://cdn.jsdelivr.net/gh/Just4N0bdy/Games@main/adofai2.html')">
+        <span class="badge">Underrated</span>
+        <img src="https://via.placeholder.com/400x225/24243e/ffffff?text=PICO-8" class="card-img">
+        <div class="card-content">
+          <h3>A Dance of Fire and Ice</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;"></p>
+        </div>
+      </div>
+
+      <div class="trending-card" onclick="openGame('DOS Wasm X', 'https://cdn.jsdelivr.net/gh/Just4N0bdy/Random-Stuff@main/doswasmx.html')">
+        <span class="badge">New</span>
+        <img src="https://via.placeholder.com/400x225/0f0c29/ffffff?text=DOS+Wasm" class="card-img">
+        <div class="card-content">
+          <h3>DOS Wasm X</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">PC Gaming from the 90s.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Settings functionality
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsMenu = document.getElementById('settingsMenu');
+    const siteName = document.getElementById('siteName');
+    const faviconInput = document.getElementById('faviconInput');
+    const resetBtn = document.getElementById('resetBtn');
+    const cursorOptions = document.querySelectorAll('.cursor-option');
+
+    // Toggle settings menu
+    settingsBtn.addEventListener('click', () => {
+      settingsMenu.classList.toggle('show');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#settingsBtn') && !e.target.closest('#settingsMenu')) {
+        settingsMenu.classList.remove('show');
+      }
+    });
+
+    // Load settings from localStorage
+    function loadSettings() {
+      const savedName = localStorage.getItem('siteName') || 'Andromeda';
+      const savedCursor = localStorage.getItem('cursorStyle') || 'auto';
+      const savedFavicon = localStorage.getItem('faviconData');
+
+      siteName.value = savedName;
+      document.title = savedName + '';
+      document.body.style.cursor = savedCursor;
+
+      // Update cursor button states
+      cursorOptions.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-cursor') === savedCursor) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Load favicon
+      if (savedFavicon) {
+        setFavicon(savedFavicon);
+      }
+    }
+
+    // Site name change
+    siteName.addEventListener('change', (e) => {
+      const newName = e.target.value || 'Andromeda';
+      localStorage.setItem('siteName', newName);
+      document.title = newName + '';
+    });
+
+    // Cursor style change
+    cursorOptions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cursor = btn.getAttribute('data-cursor');
+        localStorage.setItem('cursorStyle', cursor);
+        document.body.style.cursor = cursor;
+
+        cursorOptions.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Favicon upload
+    faviconInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          localStorage.setItem('faviconData', dataUrl);
+          setFavicon(dataUrl);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Set favicon
+    function setFavicon(dataUrl) {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = dataUrl;
+    }
+
+    // Reset to default
+    resetBtn.addEventListener('click', () => {
+      localStorage.clear();
+      siteName.value = 'Andromeda';
+      document.title = '';
+      document.body.style.cursor = 'auto';
+      
+      let link = document.querySelector("link[rel~='icon']");
+      if (link) link.href = '';
+
+      cursorOptions.forEach(btn => btn.classList.remove('active'));
+      cursorOptions[0].classList.add('active');
+
+      faviconInput.value = '';
+      settingsMenu.classList.remove('show');
+    });
+
+    // Initialize settings on page load
+    loadSettings();
+
+    // --- Quote Generator ---
+    const quotes = [
+      "	join team c00lkidd today!!",
+      "	DON'T PLAY ROBLOX ON MARCH 18TH?!?!",
+      "	all your base are belong 2 me",
+      "AHHHHHHHHHHHHHHHHHHHHHHHHHHH Fresh MEat",
+      "MrBeast Give me some money",
+      "Gluten free, Lactose free",
+      "100% Fresh Meat"
+    ];
+
+    function newQuote() {
+      const quoteBox = document.getElementById('quote-box');
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteBox.textContent = `"${randomQuote}"`;
+    }
+    
+    setInterval(newQuote, 5000);
+    newQuote();
+
+    // --- Launch Logic ---
+    function openGame(name, url) {
+      sessionStorage.setItem("gameUrl", url);
+      sessionStorage.setItem("gameName", name);
+      location.href = "game.html";
+    }
+
+    function launchProxy() {
+      let url = document.getElementById('proxy-input').value;
+      if (!url) return;
+      if (!url.startsWith('http')) {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+      }
+      window.open(url, '_blank');
+    }
+
+    document.getElementById('proxy-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') launchProxy();
+    });
+  </script>
+</body>
+</html>
