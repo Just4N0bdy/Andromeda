@@ -9,13 +9,15 @@
   <style>
     :root {
       /* Windows 11 Dark Theme Palette */
-      --bg-gradient: radial-gradient(circle at 50% -20%, #3b448f 0%, #1a1a1a 80%, #000000 100%);
-      --glass-bg: rgba(32, 32, 32, 0.7); 
+      --bg-gradient: #495bff;
+      --glass-bg: rgba(#5e6eff); 
       --glass-border: rgba(255, 255, 255, 0.08);
-      --accent-color: #0078d4; 
+      --accent-color: #6c7bff; 
       --text-main: #ffffff;
       --text-muted: #a1a1a1;
-      --taskbar-bg: rgba(28, 28, 28, 0.85);
+      --taskbar-bg: rgba(255, 255, 255, 0.05);
+      --favorite-color: #ffd700;
+      --coin-color: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -104,15 +106,35 @@
       flex-direction: column;
     }
 
+    .stars-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+      animation: twinkle 4s ease-in-out infinite;
+    }
+
     .hero {
       text-align: center;
       margin-bottom: 60px;
     }
 
     .main-logo {
-      font-size: 5rem;
+      font-size: 4.5rem;
       font-weight: 700;
-      color: #fff;
+      color: #0091ff;
       margin-bottom: 10px;
       letter-spacing: -2px;
     }
@@ -143,6 +165,10 @@
     .proxy-box:focus-within {
       background: rgba(50, 50, 50, 0.8);
       border-bottom: 2px solid var(--accent-color);
+    }
+    Background-:
+    {
+
     }
 
     .proxy-input {
@@ -268,6 +294,278 @@
       opacity: 0.9;
       box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
     }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .modal-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-close:hover {
+      opacity: 1;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+      background: rgba(40, 40, 40, 0.6);
+      color: var(--text-main);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      background: rgba(50, 50, 50, 0.8);
+      border-color: var(--accent-color);
+    }
+
+    .form-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-color), #0066b3);
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+    }
+
+    .form-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+    }
+
+    .form-toggle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .form-toggle button {
+      background: none;
+      border: none;
+      color: var(--accent-color);
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .profile-info {
+      background: linear-gradient(135deg, rgba(0, 120, 212, 0.15), rgba(0, 120, 212, 0.05));
+      border: 1px solid rgba(0, 120, 212, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .profile-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+
+    .profile-stat-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .profile-stat-value {
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .shop-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .shop-item {
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.15), rgba(255, 165, 0, 0.05));
+      border: 1.5px solid rgba(255, 165, 0, 0.4);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .shop-item:hover {
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.25), rgba(255, 165, 0, 0.1));
+      border-color: rgba(255, 165, 0, 0.6);
+      transform: translateX(5px);
+    }
+
+    .shop-item-info {
+      flex: 1;
+    }
+
+    .shop-item-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+
+    .shop-item-price {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--coin-color);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .shop-btn {
+      padding: 6px 14px;
+      background: linear-gradient(135deg, var(--coin-color), #ff8c00);
+      border: none;
+      border-radius: 6px;
+      color: #000;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(255, 165, 0, 0.3);
+    }
+
+    .shop-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.08);
+      box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
+    }
+
+    .shop-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .daily-quest {
+      background: linear-gradient(135deg, rgba(0, 120, 212, 0.15), rgba(0, 120, 212, 0.05));
+      border: 1px solid rgba(0, 120, 212, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .quest-title {
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-main);
+      font-size: 1.1rem;
+    }
+
+    .quest-progress {
+      margin-bottom: 15px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      border: 1px solid rgba(0, 120, 212, 0.3);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-color), var(--favorite-color));
+      transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .quest-reward {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 120, 212, 0.2);
+      font-size: 0.9rem;
+    }
+
+    .coin-icon {
+      color: var(--coin-color);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
     .section-title {
       align-self: flex-start;
       margin-bottom: 25px;
@@ -277,43 +575,57 @@
 
     .trending-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 25px;
       width: 100%;
     }
 
     .trending-card {
       background: var(--glass-bg);
-      border-radius: 16px;
+      border-radius: 12px;
       border: 1px solid var(--glass-border);
-      overflow: hidden;
+      overflow: visible;
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27), box-shadow 0.3s ease;
       position: relative;
       cursor: pointer;
+      text-align: center;
     }
 
     .trending-card:hover {
-      transform: translateY(-10px);
+      transform: translateY(-5px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       border-color: var(--accent-color);
     }
 
     .card-img {
-      width: 100%;
-      height: 160px;
+      width: 80px;
+      height: 80px;
       object-fit: cover;
       opacity: 0.8;
       transition: 0.3s ease;
+      border-radius: 20%;
+      margin: 20px auto 10px;
+      display: block;
     }
 
     .trending-card:hover .card-img { opacity: 1; transform: scale(1.05); }
 
-    .card-content { padding: 20px; }
+    .card-content { padding: 0 20px 20px; }
+
+    .card-content h3 {
+      font-size: 1.1rem;
+    }
+
+    .card-content p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
 
     .badge {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 25px;
+      right: 25px;
       background: var(--accent-color);
       color: white;
       font-size: 0.7rem;
@@ -328,14 +640,37 @@
       .main-logo { font-size: 3.5rem; }
       .sidebar { bottom: 10px; width: 90%; }
     }
+    /* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #0688e5;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #0078d4;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #00457a;
+}
   </style>
 </head>
 <body>
+    <div class="stars-container" id="starsContainer"></div>
 
   <nav class="sidebar">
     <a href="home.html"><button class="nav-btn" data-tooltip="Home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button></a>
     <a href="index.html"><button class="nav-btn" data-tooltip="Games"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></button></a>
     <a href="apps.html"><button class="nav-btn" data-tooltip="Apps"><svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg></button></a>
+    <button class="nav-btn" onclick="openModal('profileModal')" data-tooltip="Profile"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></button>
+    <button class="nav-btn" onclick="openModal('shopModal')" data-tooltip="Shop"><svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg></button>
+    <button class="nav-btn" onclick="openModal('questModal')" data-tooltip="Daily Quest"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></button>
     <button class="nav-btn" id="settingsBtn" data-tooltip="Settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.62l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.48.1.62l2.03 1.58c-.05.3-.07.62-.07.94 0 .33.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.62l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.48-.1-.62l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
   </nav>
 
@@ -368,7 +703,7 @@
 
   <div class="container">
     <header class="hero">
-      <h1 class="main-logo">Andromeda</h1>
+      <h1 class="main-logo">ANDROMEDA</h1>
       <div class="quote-container" id="quote-box">"Loading..."</div>
     </header>
 
@@ -397,6 +732,24 @@
         </div>
       </div>
 
+      <div class="trending-card" onclick="openGame('Undertale: LAST BREATH', 'https://cdn.jsdelivr.net/gh/Just4N0bdy/GAME-ASSETS@main/LASTBREATH/index.html')">
+        <span class="badge">HARD</span>
+        <img src="https://via.placeholder.com/400x225/24243e/ffffff?text=PICO-8" class="card-img">
+        <div class="card-content">
+          <h3>Undertale: LAST BREATH</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;"></p>
+        </div>
+      </div>
+
+      <div class="trending-card" onclick="openGame('Bad Time Simulator', 'https://cdn.jsdelivr.net/gh/selenite-cc/selenite-old@main/badtimesimulator/index.html')">
+        <span class="badge">HARD</span>
+        <img src="https://via.placeholder.com/400x225/24243e/ffffff?text=PICO-8" class="card-img">
+        <div class="card-content">
+          <h3>Bad Time Simulator</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;"></p>
+        </div>
+      </div>
+
       <div class="trending-card" onclick="openGame('DOS Wasm X', 'https://cdn.jsdelivr.net/gh/Just4N0bdy/Random-Stuff@main/doswasmx.html')">
         <span class="badge">New</span>
         <img src="https://via.placeholder.com/400x225/0f0c29/ffffff?text=DOS+Wasm" class="card-img">
@@ -408,7 +761,116 @@
     </div>
   </div>
 
+  <!-- Profile Modal -->
+  <div class="modal" id="profileModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('profileModal')">×</button>
+      <div class="modal-header">Account</div>
+      
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="loginUsername" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="loginPassword" placeholder="Enter password">
+        </div>
+        <button class="form-btn" onclick="handleLogin()">Login</button>
+        <div class="form-toggle">
+          Don't have an account? <button onclick="toggleAuthForm()">Sign Up</button>
+        </div>
+      </div>
+
+      <div id="signupForm" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="signupUsername" placeholder="Create username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="signupPassword" placeholder="Create password">
+        </div>
+        <button class="form-btn" onclick="handleSignup()">Sign Up</button>
+        <div class="form-toggle">
+          Already have an account? <button onclick="toggleAuthForm()">Login</button>
+        </div>
+      </div>
+
+      <div id="profileView" style="display: none;">
+        <div class="profile-info">
+          <div class="profile-stat">
+            <span class="profile-stat-label">Username:</span>
+            <span class="profile-stat-value" id="profileUsername">-</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-label">Coins:</span>
+            <span class="profile-stat-value"><span style="color: var(--coin-color);">💰</span> <span id="profileCoins">0</span></span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-label">Playtime:</span>
+            <span class="profile-stat-value" id="profilePlaytime">0 min</span>
+          </div>
+          <div class="profile-stat">
+            <span class="profile-stat-label">Quests Completed:</span>
+            <span class="profile-stat-value" id="profileQuests">0</span>
+          </div>
+        </div>
+        <button class="form-btn" onclick="handleLogout()" style="background: linear-gradient(135deg, #dc3545, #c71c1c);">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shop Modal -->
+  <div class="modal" id="shopModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('shopModal')">×</button>
+      <div class="modal-header">🛍️ Shop</div>
+      <div class="form-label" style="margin-bottom: 15px;">💰 Balance: <span id="shopBalance">0</span></div>
+      <div class="shop-grid" id="shopItems"></div>
+    </div>
+  </div>
+
+  <!-- Quest Modal -->
+  <div class="modal" id="questModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('questModal')">×</button>
+      <div class="modal-header">⚡ Daily Quest</div>
+      <div class="daily-quest">
+        <div class="quest-title">🎮 Play Games - 60 Minutes</div>
+        <div class="quest-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="questProgress" style="width: 0%"></div>
+          </div>
+          <div class="progress-text"><span id="questTime">0</span> / 60 minutes</div>
+        </div>
+        <div class="quest-reward">
+          <span>Complete for reward:</span>
+          <span class="coin-icon">💰 20</span>
+        </div>
+        <button class="form-btn" id="questBtn" onclick="completeQuest()" style="margin-top: 15px; display: none;">Claim Reward</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Generate decorative stars
+    function generateStars() {
+      const starsContainer = document.getElementById('starsContainer');
+      const starCount = window.innerWidth > 768 ? 100 : 50;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starsContainer.appendChild(star);
+      }
+    }
+
+    // Generate stars on page load
+    generateStars();
     // Settings functionality
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsMenu = document.getElementById('settingsMenu');
@@ -545,16 +1007,316 @@
     }
 
     function launchProxy() {
-      let url = document.getElementById('proxy-input').value;
-      if (!url) return;
-      if (!url.startsWith('http')) {
-        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+  let url = document.getElementById('proxy-input').value.trim();
+  if (!url) return;
+
+  // Process search vs URL
+  if (!url.startsWith('http') && !url.includes('.')) {
+    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+  } else if (!url.startsWith('http')) {
+    url = 'https://' + url;
+  }
+
+  // Use an unblocking service prefix
+  const proxyService = "https://r.joshuajonah.org/proxy/"; // Example public node
+  const finalUrl = proxyService + url;
+
+  sessionStorage.setItem("gameUrl", finalUrl);
+  sessionStorage.setItem("gameName", "Proxy Browser");
+  location.href = "game.html";
+}
+
+    // ===== ACCOUNT & PROFILE SYSTEM =====
+    let currentUser = null;
+    let userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || {};
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = localStorage.getItem('currentSession');
+      if (session) {
+        currentUser = session;
+        updateProfileUI();
       }
-      window.open(url, '_blank');
+    });
+
+    function toggleAuthForm() {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+      signupForm.style.display = signupForm.style.display === 'none' ? 'block' : 'none';
     }
 
-    document.getElementById('proxy-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') launchProxy();
+    function handleLogin() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      
+      if (!username || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (!userAccounts[username] || userAccounts[username].password !== password) {
+        alert('Invalid username or password');
+        return;
+      }
+      
+      currentUser = username;
+      localStorage.setItem('currentSession', username);
+      localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+      updateProfileUI();
+      startPlaytimeTracking();
+      
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('signupForm').style.display = 'none';
+    }
+
+    function handleSignup() {
+      const username = document.getElementById('signupUsername').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      
+      if (!username || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (userAccounts[username]) {
+        alert('Username already exists');
+        return;
+      }
+      
+      userAccounts[username] = {
+        password: password,
+        coins: 0,
+        playtime: 0,
+        questsCompleted: 0,
+        ownedCursors: [],
+        lastQuestDate: new Date().toDateString()
+      };
+      
+      currentUser = username;
+      localStorage.setItem('currentSession', username);
+      localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+      updateProfileUI();
+      startPlaytimeTracking();
+      
+      document.getElementById('signupUsername').value = '';
+      document.getElementById('signupPassword').value = '';
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('signupForm').style.display = 'none';
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('currentSession');
+      updateProfileUI();
+      playSessionStartTime = null;
+    }
+
+    function updateProfileUI() {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const profileView = document.getElementById('profileView');
+      const shopBalance = document.getElementById('shopBalance');
+      
+      if (currentUser && userAccounts[currentUser]) {
+        const userData = userAccounts[currentUser];
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'none';
+        profileView.style.display = 'block';
+        
+        document.getElementById('profileUsername').textContent = currentUser;
+        document.getElementById('profileCoins').textContent = userData.coins;
+        document.getElementById('profilePlaytime').textContent = userData.playtime + ' min';
+        document.getElementById('profileQuests').textContent = userData.questsCompleted;
+        
+        shopBalance.textContent = userData.coins;
+        updateShopUI();
+        updateQuestUI();
+      } else {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        profileView.style.display = 'none';
+      }
+    }
+
+    // ===== SHOP SYSTEM =====
+    const cursors = [
+      { id: 'neon', name: '✨ Neon Cursor', price: 50 },
+      { id: 'fire', name: '🔥 Fire Cursor', price: 75 },
+      { id: 'ice', name: '❄️ Ice Cursor', price: 100 },
+      { id: 'rainbow', name: '🌈 Rainbow Cursor', price: 150 }
+    ];
+
+    function updateShopUI() {
+      if (!currentUser) return;
+      
+      const shopItems = document.getElementById('shopItems');
+      shopItems.innerHTML = '';
+      const userData = userAccounts[currentUser];
+      
+      cursors.forEach(cursor => {
+        const isOwned = userData.ownedCursors.includes(cursor.id);
+        const item = document.createElement('div');
+        item.className = 'shop-item';
+        item.innerHTML = `
+          <div class="shop-item-info">
+            <div class="shop-item-name">${cursor.name}</div>
+            <div class="shop-item-price">💰 ${cursor.price}</div>
+          </div>
+          <button class="shop-btn" onclick="buyCursor('${cursor.id}', ${cursor.price})" ${isOwned ? 'disabled' : ''}>${isOwned ? 'Owned' : 'Buy'}</button>
+        `;
+        shopItems.appendChild(item);
+      });
+    }
+
+    function buyCursor(cursorId, price) {
+      if (!currentUser) return;
+      const userData = userAccounts[currentUser];
+      
+      if (userData.ownedCursors.includes(cursorId)) {
+        alert('Already owned');
+        return;
+      }
+      
+      if (userData.coins < price) {
+        alert('Not enough coins');
+        return;
+      }
+      
+      userData.coins -= price;
+      userData.ownedCursors.push(cursorId);
+      localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+      updateProfileUI();
+      alert('Cursor purchased!');
+    }
+
+    // ===== DAILY QUEST SYSTEM =====
+    function updateQuestUI() {
+      if (!currentUser) return;
+      
+      const userData = userAccounts[currentUser];
+      const today = new Date().toDateString();
+      
+      if (userData.lastQuestDate !== today) {
+        userData.playtime = 0;
+        userData.lastQuestDate = today;
+        localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+      }
+      
+      const playtime = userData.playtime || 0;
+      const progress = Math.min((playtime / 60) * 100, 100);
+      const questBtn = document.getElementById('questBtn');
+      
+      document.getElementById('questProgress').style.width = progress + '%';
+      document.getElementById('questTime').textContent = playtime;
+      
+      if (playtime >= 60) {
+        questBtn.style.display = 'block';
+      } else {
+        questBtn.style.display = 'none';
+      }
+    }
+
+    function completeQuest() {
+      if (!currentUser) return;
+      const userData = userAccounts[currentUser];
+      
+      if (userData.playtime < 60) {
+        alert('Not enough playtime');
+        return;
+      }
+      
+      userData.coins += 20;
+      userData.questsCompleted += 1;
+      userData.playtime = 0;
+      userData.lastQuestDate = new Date().toDateString();
+      
+      localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+      updateProfileUI();
+      alert('Quest completed! +20 coins');
+      document.getElementById('questBtn').style.display = 'none';
+    }
+
+    // ===== MODAL SYSTEM =====
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('show');
+      }
+    });
+
+    // ===== PLAYTIME TRACKING =====
+    let playSessionStartTime = null;
+    let isIdleMode = false;
+    let idleTimer = null;
+    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+    function startPlaytimeTracking() {
+      if (!currentUser) return;
+      if (!playSessionStartTime) {
+        playSessionStartTime = Date.now();
+        isIdleMode = false;
+      }
+    }
+
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      if (isIdleMode) {
+        isIdleMode = false;
+        playSessionStartTime = Date.now();
+      }
+      
+      idleTimer = setTimeout(() => {
+        isIdleMode = true;
+      }, IDLE_TIMEOUT);
+    }
+
+    function savePlaytime() {
+      if (!currentUser || !playSessionStartTime || isIdleMode) return;
+      
+      userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || {};
+      const userData = userAccounts[currentUser];
+      if (!userData) return;
+      
+      const today = new Date().toDateString();
+      if (userData.lastQuestDate !== today) {
+        userData.playtime = 0;
+        userData.lastQuestDate = today;
+      }
+      
+      const timeSpent = Math.floor((Date.now() - playSessionStartTime) / 1000 / 60);
+      if (timeSpent > 0) {
+        userData.playtime += timeSpent;
+        playSessionStartTime = Date.now();
+        localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
+        updateQuestUI();
+      }
+    }
+
+    // Activity listeners
+    ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(event => {
+      document.addEventListener(event, () => {
+        startPlaytimeTracking();
+        resetIdleTimer();
+      });
+    });
+
+    // Save playtime every 10 seconds
+    setInterval(() => { savePlaytime(); }, 10000);
+
+    // Save on page unload
+    window.addEventListener('beforeunload', () => {
+      savePlaytime();
     });
   </script>
 </body>
